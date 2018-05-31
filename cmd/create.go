@@ -47,6 +47,14 @@ var questions = []*survey.Question{
 		Name:   "description",
 		Prompt: &survey.Editor{Message: "Please enter a description"},
 	},
+	//{
+	//	Name: "Sprint",
+	//	Prompt: &survey.Select{
+	//		Message: "Choose a sprint:",
+	//		Options: []string{"Backlog", "Candidates"},
+	//		Default: "Backlog",
+	//	},
+	//},
 }
 
 // createCmd represents the create command
@@ -71,7 +79,7 @@ var createCmd = &cobra.Command{
 
 		i := jira.Issue{
 			Fields: &jira.IssueFields{
-				Reporter:    &jira.User{Name: viper.GetString("jira_user")},
+				Reporter:    &jira.User{Name: viper.GetString("jira_account")},
 				Project:     jira.Project{Key: answers.Project},
 				Summary:     answers.Title,
 				Description: answers.Description,
