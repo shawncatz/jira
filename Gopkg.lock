@@ -49,6 +49,12 @@
   version = "v1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/logrusorgru/aurora"
+  packages = ["."]
+  revision = "d694e6f975a9109e2b063829d563a7c153c4b53c"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
@@ -182,6 +188,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4575468f6428376ab29d9bfb423063010a615b2f68db08d523726078d7cae280"
+  inputs-digest = "2fdfa3a682c2c37828d1c8d8dd81b628b48b25d9f05fd6f9307c06b4a216343f"
   solver-name = "gps-cdcl"
   solver-version = 1

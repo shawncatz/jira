@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // showCmd represents the show command
@@ -33,18 +34,19 @@ var showCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("%s: %+v\n", issue.Key, issue.Fields.Summary)
-		fmt.Printf("Type: %s\n", issue.Fields.Type.Name)
-		fmt.Printf("Priority: %s\n", issue.Fields.Priority.Name)
+		fmt.Printf("%-15s: %+v\n", white(issue.Key), cyan(issue.Fields.Summary))
+		fmt.Printf("%-15s: %s\n", white("Type"), cyan(issue.Fields.Type.Name))
+		fmt.Printf("%-15s: %s\n", white("Priority"), cyan(issue.Fields.Priority.Name))
 		if issue.Fields.Assignee != nil {
-			fmt.Printf("Assigned: %s\n", issue.Fields.Assignee.Name)
+			fmt.Printf("%-15s: %s\n", white("Assigned"), cyan(issue.Fields.Assignee.Name))
 		}
-		fmt.Printf("Description:\n%s\n", issue.Fields.Description)
+		fmt.Printf("%-15s:\n%s\n\n", white("Description"), issue.Fields.Description)
 		if len(issue.Fields.Comments.Comments) > 0 {
 			for _, c := range issue.Fields.Comments.Comments {
-				fmt.Printf("--- %s\n%s\n", c.Author.Name, c.Body)
+				fmt.Printf("%s (%s)\n%s\n\n", white(c.Author.Name), cyan(c.Author.EmailAddress), gray(c.Body))
 			}
 		}
+		fmt.Println(cyan(viper.GetString("jira_base") + "/browse/" + issue.Key))
 	},
 }
 

@@ -89,6 +89,15 @@ var createCmd = &cobra.Command{
 
 		fmt.Printf("%#v\n", i)
 		fmt.Printf("%#v\n", i.Fields)
+
+		issue, _, err := jiraClient.Issue.Create(&i)
+		if err != nil {
+			fmt.Print(err.Error())
+			return
+		}
+
+		fmt.Printf("Created: %s\n", white(issue.Key))
+		fmt.Printf("%s", cyan(viper.GetString("jira_base")+"/browse/"+issue.Key))
 	},
 }
 
