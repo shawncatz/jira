@@ -16,16 +16,19 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"syscall"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// showCmd represents the show command
-var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Display information about a JIRA issue",
-	Long:  "Display information about a JIRA issue",
+// browseCmd represents the browse command
+var browseCmd = &cobra.Command{
+	Use:   "browse <ISSUE>",
+	Short: "Open a browser to JIRA issue",
+	Long:  "Open a browser to JIRA issue",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		issue, _, err := jiraClient.Issue.Get(args[0], nil)
@@ -33,33 +36,27 @@ var showCmd = &cobra.Command{
 			printErr("error finding issue (%s):\n%s\n", args[0], err)
 			return
 		}
-
-		fmt.Printf("%-15s: %+v\n", white(issue.Key), cyan(issue.Fields.Summary))
-		fmt.Printf("%-15s: %s\n", white("Type"), cyan(issue.Fields.Type.Name))
-		fmt.Printf("%-15s: %s\n", white("Priority"), cyan(issue.Fields.Priority.Name))
-		if issue.Fields.Assignee != nil {
-			fmt.Printf("%-15s: %s\n", white("Assigned"), cyan(issue.Fields.Assignee.Name))
+		url := viper.GetString("jira_base") + "/browse/" + issue.Key
+		fmt.Println(cyan("opening: " + url))
+		bin, err := exec.LookPath("open")
+		if err != nil {
+			printErr("error: %s", err.Error())
 		}
-		fmt.Printf("%-15s:\n%s\n\n", white("Description"), issue.Fields.Description)
-		if len(issue.Fields.Comments.Comments) > 0 {
-			for _, c := range issue.Fields.Comments.Comments {
-				fmt.Printf("%s (%s)\n%s\n\n", white(c.Author.Name), cyan(c.Author.EmailAddress), gray(c.Body))
-			}
-		}
-		fmt.Println(cyan(viper.GetString("jira_base") + "/browse/" + issue.Key))
+		env := os.Environ()
+		syscall.Exec(bin, []string{"open", url}, env)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(showCmd)
+	rootCmd.AddCommand(browseCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// showCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// browseCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// browseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
