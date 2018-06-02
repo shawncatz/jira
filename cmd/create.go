@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/andygrunwald/go-jira"
 	"github.com/spf13/cobra"
@@ -43,10 +44,10 @@ var questions = []*survey.Question{
 		Validate:  survey.Required,
 		Transform: survey.Title,
 	},
-	{
-		Name:   "description",
-		Prompt: &survey.Editor{Message: "Please enter a description"},
-	},
+	//{
+	//	Name:   "description",
+	//	Prompt: &survey.Editor{Message: "Please enter a description"},
+	//},
 	//{
 	//	Name: "Sprint",
 	//	Prompt: &survey.Select{
@@ -75,29 +76,35 @@ var createCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("answers: %#v\n", answers)
+		if debug {
+			fmt.Printf("answers: %#v\n", answers)
+		}
 
 		i := jira.Issue{
 			Fields: &jira.IssueFields{
-				Reporter:    &jira.User{Name: viper.GetString("jira_account")},
 				Project:     jira.Project{Key: answers.Project},
+				Type:        jira.IssueType{Name: answers.Type},
 				Summary:     answers.Title,
 				Description: answers.Description,
 				Labels:      []string{"from-cli"},
 			},
 		}
 
-		fmt.Printf("%#v\n", i)
-		fmt.Printf("%#v\n", i.Fields)
+		if debug {
+			fmt.Printf("%#v\n", i)
+			fmt.Printf("%#v\n", i.Fields)
+		}
 
-		issue, _, err := jiraClient.Issue.Create(&i)
+		issue, response, err := jiraClient.Issue.Create(&i)
 		if err != nil {
-			fmt.Print(err.Error())
+			printErr(err.Error())
+			b, _ := ioutil.ReadAll(response.Response.Body)
+			fmt.Printf("response:\n%s\n", string(b))
 			return
 		}
 
 		fmt.Printf("Created: %s\n", white(issue.Key))
-		fmt.Printf("%s", cyan(viper.GetString("jira_base")+"/browse/"+issue.Key))
+		fmt.Printf("%s\n", cyan(viper.GetString("jira_base")+"/browse/"+issue.Key))
 	},
 }
 
