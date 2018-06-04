@@ -44,10 +44,10 @@ var questions = []*survey.Question{
 		Validate:  survey.Required,
 		Transform: survey.Title,
 	},
-	//{
-	//	Name:   "description",
-	//	Prompt: &survey.Editor{Message: "Please enter a description"},
-	//},
+	{
+		Name:   "description",
+		Prompt: &survey.Editor{Message: "Please enter a description"},
+	},
 	//{
 	//	Name: "Sprint",
 	//	Prompt: &survey.Select{
