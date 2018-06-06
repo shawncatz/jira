@@ -62,7 +62,7 @@ release: clean tag-push build
 		--user $(GITHUB_USER) \
 		--repo $(GITHUB_REPO) \
 		--tag $(TAG) \
-		--name "$(TARGET)" \
+		--name "$(TARGET)-darwin-amd64-$(VERSION)" \
 		--file $(TARGET)
 
 tag:
