@@ -55,7 +55,7 @@ release: clean tag-push build
 		--user $(GITHUB_USER) \
 		--repo $(GITHUB_REPO) \
 		--tag $(TAG) \
-		--name "$(TARGET)"
+		--name "$(TARGET) $(TAG)"
 
 	@echo uploading release...
 	@github-release upload \
