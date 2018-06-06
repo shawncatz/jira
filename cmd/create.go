@@ -39,6 +39,14 @@ var questions = []*survey.Question{
 		},
 	},
 	{
+		Name: "Sprint",
+		Prompt: &survey.Select{
+			Message: "Choose a sprint:",
+			Options: []string{"Backlog", "Candidates"},
+			Default: "Backlog",
+		},
+	},
+	{
 		Name:      "title",
 		Prompt:    &survey.Input{Message: "Title for issue?"},
 		Validate:  survey.Required,
@@ -48,14 +56,6 @@ var questions = []*survey.Question{
 		Name:   "description",
 		Prompt: &survey.Editor{Message: "Please enter a description"},
 	},
-	//{
-	//	Name: "Sprint",
-	//	Prompt: &survey.Select{
-	//		Message: "Choose a sprint:",
-	//		Options: []string{"Backlog", "Candidates"},
-	//		Default: "Backlog",
-	//	},
-	//},
 }
 
 // createCmd represents the create command
@@ -69,6 +69,7 @@ var createCmd = &cobra.Command{
 			Title       string
 			Description string
 			Type        string
+			Sprint      string
 		}{}
 		err := survey.Ask(questions, &answers)
 		if err != nil {
@@ -80,14 +81,20 @@ var createCmd = &cobra.Command{
 			fmt.Printf("answers: %#v\n", answers)
 		}
 
+		f := &jira.IssueFields{
+			Project:     jira.Project{Key: answers.Project},
+			Type:        jira.IssueType{Name: answers.Type},
+			Summary:     answers.Title,
+			Description: answers.Description,
+			Labels:      []string{"from-cli"},
+		}
+
+		if answers.Sprint != "Backlog" {
+			f.Sprint = &jira.Sprint{Name: answers.Sprint}
+		}
+
 		i := jira.Issue{
-			Fields: &jira.IssueFields{
-				Project:     jira.Project{Key: answers.Project},
-				Type:        jira.IssueType{Name: answers.Type},
-				Summary:     answers.Title,
-				Description: answers.Description,
-				Labels:      []string{"from-cli"},
-			},
+			Fields: f,
 		}
 
 		if debug {

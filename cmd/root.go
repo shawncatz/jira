@@ -99,10 +99,9 @@ func initClient() {
 	user := viper.GetString("jira_user")
 	pass := viper.GetString("jira_pass")
 
-	tp := jira.CookieAuthTransport{
+	tp := jira.BasicAuthTransport{
 		Username: user,
 		Password: pass,
-		AuthURL:  fmt.Sprintf("%s/rest/auth/1/session", base),
 	}
 
 	jiraClient, err = jira.NewClient(tp.Client(), base)
