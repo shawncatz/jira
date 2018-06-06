@@ -22,20 +22,21 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/shawncatz/jira/version"
 )
 
 var jiraClient *jira.Client
 
 var cfgFile string
 var debug bool
-var version = "0.1.0"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "jira",
 	Short:   "Simple JIRA CLI",
 	Long:    `Create and show JIRA tickets from the command line.`,
-	Version: version,
+	Version: version.Version,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },

@@ -1,23 +1,29 @@
 SHELL := /bin/bash
 
-USER := shawncatz
 # The name of the executable (default is current directory name)
 TARGET := $(shell echo $${PWD\#\#*/})
 .DEFAULT_GOAL: $(TARGET)
 
+# Github
+GITHUB_USER := shawncatz
+GITHUB_REPO := $(TARGET)
+
 # These will be provided to the target
-VERSION := 1.0.0
+VERSION := $(shell cat version/VERSION)
+TAG := v$(VERSION)
 BUILD := `git rev-parse HEAD`
 
 # Use linker flags to provide version/build settings to the target
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+LDFLAGS=-ldflags \
+	"-X=github.com/$(GITHUB_USER)/$(GITHUB_REPO)/version.Build=$(BUILD) \
+	-X github.com/$(GITHUB_USER)/$(GITHUB_REPO)/version.Version=$(VERSION)"
 
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: all build clean install uninstall fmt simplify check run
 
-all: check install
+all: check
 
 $(TARGET): $(SRC)
 	@go build $(LDFLAGS) -o $(TARGET)
@@ -41,7 +47,30 @@ simplify:
 	@gofmt -s -l -w $(SRC)
 
 release-info:
-	github-release info -u $(USER) -r $(TARGET)
+	github-release info
+
+release: clean tag-push build
+	@echo creating release...
+	@github-release release \
+		--user $(GITHUB_USER) \
+		--repo $(GITHUB_REPO) \
+		--tag $(TAG) \
+		--name "$(TARGET)"
+
+	@echo uploading release...
+	@github-release upload \
+		--user $(GITHUB_USER) \
+		--repo $(GITHUB_REPO) \
+		--tag $(TAG) \
+		--name "$(TARGET)" \
+		--file $(TARGET)
+
+tag:
+	@echo creating tag...
+	@-git tag $(TAG)
+
+tag-push: tag
+	@git push --tags
 
 check:
 	@test -z $(shell gofmt -l main.go | tee /dev/stderr) || echo "[WARN] Fix formatting issues with 'make fmt'"
