@@ -8,6 +8,3 @@ var Date string
 
 // Build contains the git commit
 var Build string
-
-// GitTag contains the git tag
-var GitTag string

@@ -12,11 +12,11 @@ GITHUB_REPO := $(TARGET)
 VERSION := $(shell cat version/VERSION)
 TAG := v$(VERSION)
 BUILD := `git rev-parse HEAD`
+DATE := `date +%Y-%m-%dT%H:%M:%S%z`
+PKG := github.com/$(GITHUB_USER)/$(GITHUB_REPO)/version
 
 # Use linker flags to provide version/build settings to the target
-LDFLAGS=-ldflags \
-	"-X=github.com/$(GITHUB_USER)/$(GITHUB_REPO)/version.Build=$(BUILD) \
-	-X github.com/$(GITHUB_USER)/$(GITHUB_REPO)/version.Version=$(VERSION)"
+LDFLAGS=-ldflags "-X $(PKG).Build=$(BUILD) -X $(PKG).Version=$(VERSION) -X $(PKG).Date='$(DATE)'"
 
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
@@ -26,7 +26,7 @@ SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 all: check
 
 $(TARGET): $(SRC)
-	@go build $(LDFLAGS) -o $(TARGET)
+	go build $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)
 	@true
