@@ -42,7 +42,21 @@ opening: https://anyperk.atlassian.net/browse/TICKET-1234
 > jira create
 
 ```bash
+? Project for issue? TICKET
+? Choose an issue type: Bug
+? Choose a sprint: Backlog
+? Title for issue? Title of issue
+? Please enter a description [Enter to launch editor]
+```
 
+Some of the fields allow you to select from a list 
+(thanks to [AlecAivazis/survey](https://github.com/AlecAivazis/survey)):
+
+```bash
+? Choose an issue type:  [Use arrows to move, type to filter]
+❯ Story
+  Task
+  Bug
 ```
 
 ## Setup
@@ -75,3 +89,10 @@ with the following command:
 You can update the installed version with:
 
 > go get -u github.com/shawncatz/jira
+
+## Thanks
+
+* [AlecAivazis/survey](https://github.com/AlecAivazis/survey)
+* [spf13/cobra](https://github.com/spf13/cobra)
+* [spf13/viper](https://github.com/spf13/viper)
+* [andygrunwald/go-jira](https://github.com/andygrunwald/go-jira)
