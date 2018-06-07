@@ -48,10 +48,25 @@ func init() {
 
 func runCreate(cmd *cobra.Command, args []string) {
 	defaultProject := viper.GetString("jira_project")
+
 	typeOptions := viper.GetStringSlice("jira_types")
+	typeDefault := ""
+	if len(typeOptions) > 0 {
+		typeDefault = typeOptions[0]
+	} else {
+		printErr("you must include at least one Type in the configuration.\n" +
+			"add a list of types to " + viper.ConfigFileUsed() + ".")
+		return
+	}
+
 	sprintOptions := []string{"Backlog"}
 	for _, s := range viper.GetStringSlice("jira_sprints") {
 		sprintOptions = append(sprintOptions, s)
+	}
+
+	sprintDefault := "Backlog"
+	if len(sprintOptions) > 0 {
+		sprintDefault = sprintOptions[0]
 	}
 
 	var questions = []*survey.Question{
@@ -65,15 +80,15 @@ func runCreate(cmd *cobra.Command, args []string) {
 			Prompt: &survey.Select{
 				Message: "Choose an issue type:",
 				Options: typeOptions,
-				Default: typeOptions[0],
+				Default: typeDefault,
 			},
 		},
 		{
-			Name: "Sprint",
+			Name: "sprint",
 			Prompt: &survey.Select{
 				Message: "Choose a sprint:",
 				Options: sprintOptions,
-				Default: sprintOptions[0],
+				Default: sprintDefault,
 			},
 		},
 		{
@@ -94,6 +109,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 		Type        string
 		Sprint      string
 	}{}
+
 	err := survey.Ask(questions, &answers)
 	if err != nil {
 		fmt.Println(err.Error())
