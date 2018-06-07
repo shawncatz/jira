@@ -54,9 +54,9 @@ Some of the fields allow you to select from a list
 
 ```bash
 ? Choose an issue type:  [Use arrows to move, type to filter]
-❯ Story
+❯ Bug
   Task
-  Bug
+  Story
 ```
 
 ## Setup
@@ -67,6 +67,15 @@ Create a configuration file in `$HOME/.jira.yaml`
 jira_base: <base URL>
 jira_user: <email>
 jira_pass: <api key>
+jira_project: PROJECT
+jira_types: # First in the list is default
+  - Bug
+  - Task
+  - Story
+jira_sprints: # Automatically adds Backlog to the list
+  - Sprint1
+  - Sprint2
+  - Sprint3
 ```
 
 * `base URL`: The URL to your Atlassian Cloud JIRA account 
