@@ -26,7 +26,7 @@ SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 all: check
 
 $(TARGET): $(SRC)
-	go build $(LDFLAGS) -o $(TARGET)
+	@go build $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)
 	@true
