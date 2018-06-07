@@ -59,9 +59,15 @@ Some of the fields allow you to select from a list
   Story
 ```
 
-## Setup
+## Init
 
-Create a configuration file in `$HOME/.jira.yaml`
+Creates a default configuration file
+
+> jira init
+
+# Setup
+
+Use the `jira init` command to create a configuration file in `$HOME/.jira.yaml`
 
 ```yaml
 base: <base URL>
@@ -83,7 +89,7 @@ sprints: # Automatically adds Backlog to the list
 * `email`: The email of your account
 * `api key`: Your Atlassian API token, see [here](https://confluence.atlassian.com/cloud/api-tokens-938839638.html) for more info
 
-## Installation
+# Installation
 
 The easiest and recommended way to setup the tool is to download a prebuilt 
 [release](https://github.com/shawncatz/jira/releases) from Github.
