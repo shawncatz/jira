@@ -24,95 +24,12 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
-var questions = []*survey.Question{
-	{
-		Name:     "project",
-		Prompt:   &survey.Input{Default: "FOND", Message: "Project for issue?"},
-		Validate: survey.Required,
-	},
-	{
-		Name: "type",
-		Prompt: &survey.Select{
-			Message: "Choose an issue type:",
-			Options: []string{"Story", "Task", "Bug"},
-			Default: "Story",
-		},
-	},
-	{
-		Name: "Sprint",
-		Prompt: &survey.Select{
-			Message: "Choose a sprint:",
-			Options: []string{"Backlog", "Candidates"},
-			Default: "Backlog",
-		},
-	},
-	{
-		Name:      "title",
-		Prompt:    &survey.Input{Message: "Title for issue?"},
-		Validate:  survey.Required,
-		Transform: survey.Title,
-	},
-	{
-		Name:   "description",
-		Prompt: &survey.Editor{Message: "Please enter a description"},
-	},
-}
-
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a JIRA issue",
 	Long:  "Create a JIRA issue",
-	Run: func(cmd *cobra.Command, args []string) {
-		answers := struct {
-			Project     string
-			Title       string
-			Description string
-			Type        string
-			Sprint      string
-		}{}
-		err := survey.Ask(questions, &answers)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		if debug {
-			fmt.Printf("answers: %#v\n", answers)
-		}
-
-		f := &jira.IssueFields{
-			Project:     jira.Project{Key: answers.Project},
-			Type:        jira.IssueType{Name: answers.Type},
-			Summary:     answers.Title,
-			Description: answers.Description,
-			Labels:      []string{"from-cli"},
-		}
-
-		if answers.Sprint != "Backlog" {
-			f.Sprint = &jira.Sprint{Name: answers.Sprint}
-		}
-
-		i := jira.Issue{
-			Fields: f,
-		}
-
-		if debug {
-			fmt.Printf("%#v\n", i)
-			fmt.Printf("%#v\n", i.Fields)
-		}
-
-		issue, response, err := jiraClient.Issue.Create(&i)
-		if err != nil {
-			printErr(err.Error())
-			b, _ := ioutil.ReadAll(response.Response.Body)
-			fmt.Printf("response:\n%s\n", string(b))
-			return
-		}
-
-		fmt.Printf("Created: %s\n", white(issue.Key))
-		fmt.Printf("%s\n", cyan(viper.GetString("jira_base")+"/browse/"+issue.Key))
-	},
+	Run:   runCreate,
 }
 
 func init() {
@@ -127,4 +44,95 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func runCreate(cmd *cobra.Command, args []string) {
+	defaultProject := viper.GetString("jira_project")
+	typeOptions := viper.GetStringSlice("jira_types")
+	sprintOptions := []string{"Backlog"}
+	for _, s := range viper.GetStringSlice("jira_sprints") {
+		sprintOptions = append(sprintOptions, s)
+	}
+
+	var questions = []*survey.Question{
+		{
+			Name:     "project",
+			Prompt:   &survey.Input{Default: defaultProject, Message: "Project for issue?"},
+			Validate: survey.Required,
+		},
+		{
+			Name: "type",
+			Prompt: &survey.Select{
+				Message: "Choose an issue type:",
+				Options: typeOptions,
+				Default: typeOptions[0],
+			},
+		},
+		{
+			Name: "Sprint",
+			Prompt: &survey.Select{
+				Message: "Choose a sprint:",
+				Options: sprintOptions,
+				Default: sprintOptions[0],
+			},
+		},
+		{
+			Name:      "title",
+			Prompt:    &survey.Input{Message: "Title for issue?"},
+			Validate:  survey.Required,
+			Transform: survey.Title,
+		},
+		{
+			Name:   "description",
+			Prompt: &survey.Editor{Message: "Please enter a description"},
+		},
+	}
+	answers := struct {
+		Project     string
+		Title       string
+		Description string
+		Type        string
+		Sprint      string
+	}{}
+	err := survey.Ask(questions, &answers)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	if debug {
+		fmt.Printf("answers: %#v\n", answers)
+	}
+
+	f := &jira.IssueFields{
+		Project:     jira.Project{Key: answers.Project},
+		Type:        jira.IssueType{Name: answers.Type},
+		Summary:     answers.Title,
+		Description: answers.Description,
+		Labels:      []string{"from-cli"},
+	}
+
+	if answers.Sprint != "Backlog" {
+		f.Sprint = &jira.Sprint{Name: answers.Sprint}
+	}
+
+	i := jira.Issue{
+		Fields: f,
+	}
+
+	if debug {
+		fmt.Printf("%#v\n", i)
+		fmt.Printf("%#v\n", i.Fields)
+	}
+
+	issue, response, err := jiraClient.Issue.Create(&i)
+	if err != nil {
+		printErr(err.Error())
+		b, _ := ioutil.ReadAll(response.Response.Body)
+		fmt.Printf("response:\n%s\n", string(b))
+		return
+	}
+
+	fmt.Printf("Created: %s\n", white(issue.Key))
+	fmt.Printf("%s\n", cyan(viper.GetString("jira_base")+"/browse/"+issue.Key))
 }
