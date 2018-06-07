@@ -21,7 +21,6 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // browseCmd represents the browse command
@@ -36,7 +35,7 @@ var browseCmd = &cobra.Command{
 			printErr("error finding issue (%s):\n%s\n", args[0], err)
 			return
 		}
-		url := viper.GetString("jira_base") + "/browse/" + issue.Key
+		url := issueURL(issue.Key)
 		fmt.Println(cyan("opening: " + url))
 		bin, err := exec.LookPath("open")
 		if err != nil {

@@ -64,15 +64,15 @@ Some of the fields allow you to select from a list
 Create a configuration file in `$HOME/.jira.yaml`
 
 ```yaml
-jira_base: <base URL>
-jira_user: <email>
-jira_pass: <api key>
-jira_project: PROJECT
-jira_types: # First in the list is default
+base: <base URL>
+user: <email>
+pass: <api key>
+project: PROJECT
+types: # First in the list is default, must have at least one
   - Bug
   - Task
   - Story
-jira_sprints: # Automatically adds Backlog to the list
+sprints: # Automatically adds Backlog to the list
   - Sprint1
   - Sprint2
   - Sprint3

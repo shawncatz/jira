@@ -23,15 +23,15 @@ import (
 )
 
 var defaultConfig = []byte(`
-jira_base: https://yourcompany.atlassian.net
-jira_user: user@email.com
-jira_pass: password_or_api_key
-jira_project: PROJECT
-jira_types:
+base: https://yourcompany.atlassian.net
+user: user@email.com
+pass: password_or_api_key
+project: PROJECT
+types:
   - Bug
   - Task
   - Story
-jira_sprints:
+sprints:
   - Sprint1
   - Sprint2
 `)

@@ -47,9 +47,9 @@ func init() {
 }
 
 func runCreate(cmd *cobra.Command, args []string) {
-	defaultProject := viper.GetString("jira_project")
+	defaultProject := viper.GetString("jira.project")
 
-	typeOptions := viper.GetStringSlice("jira_types")
+	typeOptions := viper.GetStringSlice("jira.types")
 	typeDefault := ""
 	if len(typeOptions) > 0 {
 		typeDefault = typeOptions[0]
@@ -60,7 +60,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 	}
 
 	sprintOptions := []string{"Backlog"}
-	for _, s := range viper.GetStringSlice("jira_sprints") {
+	for _, s := range viper.GetStringSlice("jira.sprints") {
 		sprintOptions = append(sprintOptions, s)
 	}
 
@@ -150,5 +150,5 @@ func runCreate(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("Created: %s\n", white(issue.Key))
-	fmt.Printf("%s\n", cyan(viper.GetString("jira_base")+"/browse/"+issue.Key))
+	fmt.Printf("%s\n", cyan(issueURL(issue.Key)))
 }

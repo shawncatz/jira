@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // showCmd represents the show command
@@ -46,7 +45,7 @@ var showCmd = &cobra.Command{
 				fmt.Printf("%s (%s)\n%s\n\n", white(c.Author.Name), cyan(c.Author.EmailAddress), gray(c.Body))
 			}
 		}
-		fmt.Println(cyan(viper.GetString("jira_base") + "/browse/" + issue.Key))
+		fmt.Println(cyan(issueURL(issue.Key)))
 	},
 }
 

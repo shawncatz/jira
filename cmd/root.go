@@ -93,9 +93,9 @@ func initConfig() {
 // initClient sets up the JIRA client
 func initClient() {
 	var err error
-	base := viper.GetString("jira_base")
-	user := viper.GetString("jira_user")
-	pass := viper.GetString("jira_pass")
+	base := viper.GetString("jira.base")
+	user := viper.GetString("jira.user")
+	pass := viper.GetString("jira.pass")
 
 	tp := jira.BasicAuthTransport{
 		Username: user,
