@@ -16,46 +16,47 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
-	"syscall"
 
 	"github.com/spf13/cobra"
 )
 
-// browseCmd represents the browse command
-var browseCmd = &cobra.Command{
-	Use:   "browse <ISSUE>",
-	Short: "Open a browser to JIRA issue",
-	Long:  "Open a browser to JIRA issue",
-	Args:  cobra.ExactArgs(1),
+// sprintCmd represents the sprint command
+var sprintCmd = &cobra.Command{
+	Use:   "sprint",
+	Short: "List sprints",
+	Long:  "List sprints",
 	Run: func(cmd *cobra.Command, args []string) {
-		issue, _, err := jiraClient.Issue.Get(args[0], nil)
+		boards, err := getBoards()
 		if err != nil {
-			printErr("error finding issue (%s):\n%s\n", args[0], err)
+			printErr("error finding boards: %s\n", err)
 			return
 		}
-		url := issueURL(issue.Key)
-		fmt.Println(cyan("opening: " + url))
-		bin, err := exec.LookPath("open")
-		if err != nil {
-			printErr("error: %s", err.Error())
+		for _, e := range boards {
+			fmt.Printf("%d: (%s) %s\n", e.ID, e.Type, e.Name)
+			sprints, err := getSprints(e.ID)
+			if err != nil {
+				printErr("error finding sprints: %s\n", err)
+				return
+			}
+			for _, s := range sprints {
+				if s.State != "closed" {
+					fmt.Printf("   %d: (%s) %s\n", s.ID, s.EndDate, s.Name)
+				}
+			}
 		}
-		env := os.Environ()
-		syscall.Exec(bin, []string{"open", url}, env) //nolint
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(browseCmd)
+	rootCmd.AddCommand(sprintCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// browseCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// sprintCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// browseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// sprintCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

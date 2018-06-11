@@ -60,9 +60,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 	}
 
 	sprintOptions := []string{"Backlog"}
-	for _, s := range viper.GetStringSlice("jira.sprints") {
-		sprintOptions = append(sprintOptions, s)
-	}
+	sprintOptions = append(sprintOptions, viper.GetStringSlice("jira.sprints")...)
 
 	sprintDefault := "Backlog"
 	if len(sprintOptions) > 0 {
