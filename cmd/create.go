@@ -16,8 +16,8 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -44,46 +44,26 @@ func init() {
 }
 
 func runCreate(cmd *cobra.Command, args []string) {
-	defaultProject := viper.GetString("jira.project")
-
-	typeOptions := viper.GetStringSlice("jira.types")
-	typeDefault := ""
-	if len(typeOptions) > 0 {
-		typeDefault = typeOptions[0]
-	} else {
-		printErr("you must include at least one Type in the configuration.\n" +
-			"add a list of types to " + viper.ConfigFileUsed() + ".")
-		return
-	}
-
-	sprintOptions := []string{"Backlog"}
-	sprintOptions = append(sprintOptions, viper.GetStringSlice("jira.sprints")...)
-
-	sprintDefault := "Backlog"
-	if len(sprintOptions) > 0 {
-		sprintDefault = sprintOptions[0]
-	}
-
 	var questions = []*survey.Question{
 		{
 			Name:     "project",
-			Prompt:   &survey.Input{Default: defaultProject, Message: "Project for issue?"},
+			Prompt:   &survey.Input{Default: cfg.Jira.Project, Message: "Project for issue?"},
 			Validate: survey.Required,
 		},
 		{
 			Name: "type",
 			Prompt: &survey.Select{
 				Message: "Choose an issue type:",
-				Options: typeOptions,
-				Default: typeDefault,
+				Options: cfg.Jira.Types,
+				Default: cfg.DefaultType(),
 			},
 		},
 		{
 			Name: "sprint",
 			Prompt: &survey.Select{
 				Message: "Choose a sprint:",
-				Options: sprintOptions,
-				Default: sprintDefault,
+				Options: cfg.Sprints(),
+				Default: "Backlog",
 			},
 		},
 		{

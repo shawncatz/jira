@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/spf13/viper"
-
 	"github.com/shawncatz/go-jira"
 )
 
@@ -41,16 +39,13 @@ type CreateAnswers struct {
 // initClient sets up the JIRA client
 func initClient() {
 	var err error
-	base := viper.GetString("jira.base")
-	user := viper.GetString("jira.user")
-	pass := viper.GetString("jira.pass")
 
 	tp := jira.BasicAuthTransport{
-		Username: user,
-		Password: pass,
+		Username: cfg.Jira.Username,
+		Password: cfg.Jira.Password,
 	}
 
-	jiraClient, err = jira.NewClient(tp.Client(), base)
+	jiraClient, err = jira.NewClient(tp.Client(), cfg.Jira.Base)
 	if err != nil {
 		panic(err)
 	}
@@ -102,11 +97,11 @@ func printErrResponse(response *jira.Response) {
 }
 
 func issueURL(id string) string {
-	return viper.GetString("jira.base") + "/browse/" + id
+	return cfg.Jira.Base + "/browse/" + id
 }
 
 func getBoards() (list []jira.Board, err error) {
-	project := viper.GetString("jira.project")
+	project := cfg.Jira.Project
 	options := &jira.BoardListOptions{ProjectKeyOrID: project}
 	br, response, err := jiraClient.Board.GetAllBoards(options)
 	if err != nil {

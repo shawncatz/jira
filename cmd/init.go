@@ -23,17 +23,18 @@ import (
 )
 
 var defaultConfig = []byte(`
-base: https://yourcompany.atlassian.net
-user: user@email.com
-pass: password_or_api_key
-project: PROJECT
-types:
-  - Bug
-  - Task
-  - Story
-sprints:
-  - Sprint1
-  - Sprint2
+jira:
+  base: https://yourcompany.atlassian.net
+  user: user@email.com
+  pass: password_or_api_key
+  project: PROJECT
+  types:
+    - Bug
+    - Task
+    - Story
+  sprints:
+    - Sprint1
+    - Sprint2
 `)
 
 // initCmd represents the init command
