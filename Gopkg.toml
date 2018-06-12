@@ -40,3 +40,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  branch = "sprints-support-state-filter"
+  name = "github.com/shawncatz/go-jira"

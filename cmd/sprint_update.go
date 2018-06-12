@@ -16,54 +16,30 @@ package cmd
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/spf13/cobra"
 )
 
-// sprintCmd represents the sprint command
-var sprintCmd = &cobra.Command{
-	Use:   "sprint",
-	Short: "List sprints",
-	Long:  "List sprints",
+// sprintUpdateCmd represents the sprintUpdate command
+var sprintUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update list of sprints in configuration",
+	Long:  "Update list of sprints in configuration",
 	Run: func(cmd *cobra.Command, args []string) {
-		a, err := cmd.Flags().GetBool("all")
-		if err != nil {
-			printErr("failed to get option 'all'")
-		}
-		boards, err := getBoards()
-		if err != nil {
-			printErr("error finding boards: %s\n", err)
-			return
-		}
-		for _, e := range boards {
-			fmt.Printf("%d: (%s) %s\n", e.ID, e.Type, e.Name)
-			sprints, err := getSprints(e.ID, a)
-			if err != nil {
-				printErr("error finding sprints: %s\n", err)
-				return
-			}
-
-			sort.Sort(SprintCompletedDate(sprints))
-			for _, s := range sprints {
-				if a || s.State != "closed" {
-					fmt.Printf("   %3d: (%s) %s\n", s.ID, s.EndDate, s.Name)
-				}
-			}
-		}
+		fmt.Println("sprintUpdate called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(sprintCmd)
+	sprintCmd.AddCommand(sprintUpdateCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// sprintCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// sprintUpdateCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	sprintCmd.Flags().BoolP("all", "a", false, "Show all sprints")
+	// sprintUpdateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

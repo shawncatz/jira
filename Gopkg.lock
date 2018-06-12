@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/andygrunwald/go-jira"
-  packages = ["."]
-  revision = "5cfdb85cc91c6299f75b6504a1d0ec174c21be39"
-  version = "v1.3.0"
-
-[[projects]]
   name = "github.com/fatih/structs"
   packages = ["."]
   revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
@@ -103,6 +97,12 @@
   version = "v0.8.0"
 
 [[projects]]
+  branch = "sprints-support-state-filter"
+  name = "github.com/shawncatz/go-jira"
+  packages = ["."]
+  revision = "231bc31ebd8cea783a9e5d18171ab7cd46bdc1c7"
+
+[[projects]]
   name = "github.com/spf13/afero"
   packages = [
     ".",
@@ -188,6 +188,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2fdfa3a682c2c37828d1c8d8dd81b628b48b25d9f05fd6f9307c06b4a216343f"
+  inputs-digest = "5658408d384d98b437ba91ac2d63963031ffba3080b411a2e13247821b7568a5"
   solver-name = "gps-cdcl"
   solver-version = 1

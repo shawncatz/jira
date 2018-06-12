@@ -18,13 +18,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/andygrunwald/go-jira"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var jiraClient *jira.Client
 
 var cfgFile string
 var debug bool
@@ -87,23 +84,5 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("Can't read config:", err)
 		os.Exit(1)
-	}
-}
-
-// initClient sets up the JIRA client
-func initClient() {
-	var err error
-	base := viper.GetString("jira.base")
-	user := viper.GetString("jira.user")
-	pass := viper.GetString("jira.pass")
-
-	tp := jira.BasicAuthTransport{
-		Username: user,
-		Password: pass,
-	}
-
-	jiraClient, err = jira.NewClient(tp.Client(), base)
-	if err != nil {
-		panic(err)
 	}
 }

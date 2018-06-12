@@ -16,9 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
-
-	"github.com/andygrunwald/go-jira"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -100,14 +97,8 @@ func runCreate(cmd *cobra.Command, args []string) {
 			Prompt: &survey.Editor{Message: "Please enter a description"},
 		},
 	}
-	answers := struct {
-		Project     string
-		Title       string
-		Description string
-		Type        string
-		Sprint      string
-	}{}
 
+	answers := &CreateAnswers{}
 	err := survey.Ask(questions, &answers)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -118,32 +109,9 @@ func runCreate(cmd *cobra.Command, args []string) {
 		fmt.Printf("answers: %#v\n", answers)
 	}
 
-	f := &jira.IssueFields{
-		Project:     jira.Project{Key: answers.Project},
-		Type:        jira.IssueType{Name: answers.Type},
-		Summary:     answers.Title,
-		Description: answers.Description,
-		Labels:      []string{"from-cli"},
-	}
-
-	if answers.Sprint != "Backlog" {
-		f.Sprint = &jira.Sprint{Name: answers.Sprint}
-	}
-
-	i := jira.Issue{
-		Fields: f,
-	}
-
-	if debug {
-		fmt.Printf("%#v\n", i)
-		fmt.Printf("%#v\n", i.Fields)
-	}
-
-	issue, response, err := jiraClient.Issue.Create(&i)
+	issue, err := jiraCreate(answers)
 	if err != nil {
-		printErr(err.Error())
-		b, _ := ioutil.ReadAll(response.Response.Body)
-		fmt.Printf("response:\n%s\n", string(b))
+		printErr("error: %s\n", err)
 		return
 	}
 
