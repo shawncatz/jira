@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/AlecAivazis/survey.v1"
 )
 
 // sprintUpdateCmd represents the sprintUpdate command
@@ -26,7 +27,20 @@ var sprintUpdateCmd = &cobra.Command{
 	Short: "Update list of sprints in configuration",
 	Long:  "Update list of sprints in configuration",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("sprintUpdate called")
+		answer, err := askBoard()
+		if err != nil {
+			printErr("Error: %s\n", err)
+			return
+		}
+		sprints, err := getSprints(answer, false)
+
+		list := []string{}
+		for _, s := range sprints {
+			list = append(list, s.Name)
+		}
+
+		cfg.Jira.Sprints = list
+		cfg.Save()
 	},
 }
 
@@ -42,4 +56,37 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// sprintUpdateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func askBoard() (int, error) {
+	boards, err := getBoards()
+	if err != nil {
+		printErr("error: %s", err)
+		return 0, err
+	}
+
+	if len(boards) == 0 {
+		return 0, fmt.Errorf("no boards found")
+	}
+
+	if len(boards) == 1 {
+		return boards[0].ID, nil
+	}
+
+	boardsList := []string{}
+	boardsMap := map[string]int{}
+	for _, b := range boards {
+		boardsList = append(boardsList, b.Name)
+		boardsMap[b.Name] = b.ID
+	}
+	fmt.Printf("%#v\n%#v\n", boardsList, boardsMap)
+
+	answer := ""
+	q := &survey.Select{
+		Message: "Choose a board:",
+		Options: boardsList,
+	}
+	survey.AskOne(q, &answer, survey.Required)
+
+	return boardsMap[answer], nil
 }

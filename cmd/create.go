@@ -79,7 +79,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 	}
 
 	answers := &CreateAnswers{}
-	err := survey.Ask(questions, &answers)
+	err := survey.Ask(questions, answers)
 	if err != nil {
 		fmt.Println(err.Error())
 		return

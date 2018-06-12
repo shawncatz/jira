@@ -6,21 +6,23 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
-var cfg *Config
+var cfg = &Config{}
 
 type Config struct {
 	Jira JiraConfig
 }
 
 type JiraConfig struct {
-	Base     string
-	Username string `yaml:"user"`
-	Password string `yaml:"pass"`
-	Project  string
-	Types    []string
-	Sprints  []string
+	Base    string
+	User    string `yaml:"user" viper:"user"`
+	Pass    string `yaml:"pass" viper:"pass"`
+	Project string
+	Types   []string
+	Sprints []string
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -43,9 +45,14 @@ func initConfig() {
 
 	viper.AutomaticEnv() // read in environment variables that match
 
+	err := viper.ReadInConfig()
+	if err != nil {
+		printErr("error reading config: %s\n", err)
+	}
+
 	// If a config file is found, read it in.
 	if err := viper.Unmarshal(cfg); err != nil {
-		fmt.Println("Can't read config:", err)
+		fmt.Printf("Can't read config: (%#v) %s\n", cfg, err)
 		os.Exit(1)
 	}
 
@@ -69,4 +76,18 @@ func (c *Config) Sprints() []string {
 
 func (c *Config) DefaultSprint() string {
 	return "Backlog"
+}
+
+func (c *Config) Save() error {
+	b, err := yaml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(viper.ConfigFileUsed(), b, 0600)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

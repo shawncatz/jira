@@ -41,8 +41,8 @@ func initClient() {
 	var err error
 
 	tp := jira.BasicAuthTransport{
-		Username: cfg.Jira.Username,
-		Password: cfg.Jira.Password,
+		Username: cfg.Jira.User,
+		Password: cfg.Jira.Pass,
 	}
 
 	jiraClient, err = jira.NewClient(tp.Client(), cfg.Jira.Base)
@@ -105,21 +105,18 @@ func getBoards() (list []jira.Board, err error) {
 	options := &jira.BoardListOptions{ProjectKeyOrID: project}
 	br, response, err := jiraClient.Board.GetAllBoards(options)
 	if err != nil {
-		printErr("Error: %s", err)
-		if debug {
-			printErrResponse(response)
-		}
+		printErrResponse(response)
 		return list, err
 	}
 	return br.Values, err
 }
 
-func getSprints(id int, all bool) (list []jira.Sprint, err error) {
+func getSprints(boardID int, all bool) (list []jira.Sprint, err error) {
 	options := &jira.GetAllSprintsOptions{}
 	if !all {
 		options.State = "active,future"
 	}
-	return getSprintsWalk(id, all)
+	return getSprintsWalk(boardID, all)
 }
 
 func getSprintsWalk(boardID int, all bool) (list []jira.Sprint, err error) {
@@ -132,11 +129,8 @@ func getSprintsWalk(boardID int, all bool) (list []jira.Sprint, err error) {
 
 	// continue making the call and appending until we get the last response.
 	for {
-		list, response, err := jiraClient.Board.GetAllSprintsWithOptions(boardID, options)
+		list, _, err := jiraClient.Board.GetAllSprintsWithOptions(boardID, options)
 		if err != nil {
-			if debug {
-				printErrResponse(response)
-			}
 			return nil, err
 		}
 
