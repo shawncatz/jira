@@ -15,10 +15,9 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/shawncatz/jira/report"
 	"github.com/spf13/cobra"
 	"gopkg.in/AlecAivazis/survey.v1"
-	"time"
 )
 
 // reportCmd represents the report command
@@ -43,21 +42,6 @@ func init() {
 	// reportCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-type report struct {
-	Done []*issue
-	Todo []*issue
-	Open []*issue
-}
-
-type issue struct {
-	Key     string
-	Points  float64
-	Status  string
-	Type    string
-	Closed  time.Time
-	Summary string
-}
-
 func runReport(cmd *cobra.Command, args []string) {
 	a := ""
 	p := &survey.Select{
@@ -71,80 +55,23 @@ func runReport(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	report, err := getReport(a)
+	sprint := cfg.findSprint(a)
+	if sprint == nil {
+		printErr("error finding sprint")
+		return
+	}
+
+	r := report.NewSprintReport(jiraClient, sprint.ID, sprint.Name)
 	if err != nil {
 		printErr("%s\n", err)
 		return
 	}
 
-	printReport(report)
-}
-
-func getReport(name string) (*report, error) {
-	sprint := cfg.findSprint(name)
-	if sprint == nil {
-		return nil, fmt.Errorf("error finding sprint")
-	}
-
-	issues, err := getIssuesFromSprint(sprint.ID)
+	err = r.Build()
 	if err != nil {
-		return nil, fmt.Errorf("error getting issues: %s", err)
+		printErr("error building report: %s\n", err)
+		return
 	}
 
-	field, err := getPointsField()
-	if err != nil {
-		return nil, fmt.Errorf("error getting points field: %s", err)
-	}
-
-	report := &report{}
-	for _, i := range issues {
-		if i.Fields.Type.Name == "Sub-task" {
-			continue
-		}
-
-		var points float64
-		if i.Fields.Unknowns[field.Key] != nil {
-			points = i.Fields.Unknowns[field.Key].(float64)
-		}
-
-		issue := &issue{
-			Key:     i.Key,
-			Points:  points,
-			Status:  i.Fields.Status.Name,
-			Type:    i.Fields.Type.Name,
-			Closed:  time.Time(i.Fields.Resolutiondate),
-			Summary: i.Fields.Summary,
-		}
-
-		switch i.Fields.Status.StatusCategory.Name {
-		case "Done":
-			report.Done = append(report.Done, issue)
-		case "To Do":
-			report.Todo = append(report.Todo, issue)
-		case "In Progress":
-			report.Open = append(report.Open, issue)
-		}
-
-	}
-
-	return report, nil
-}
-
-func printReport(report *report) {
-	fmt.Printf("\n%s\n", white("To Do"))
-	for _, i := range report.Todo {
-		printIssue(i)
-	}
-	fmt.Printf("\n%s\n", white("Open"))
-	for _, i := range report.Open {
-		printIssue(i)
-	}
-	fmt.Printf("\n%s\n", white("Done"))
-	for _, i := range report.Done {
-		printIssue(i)
-	}
-}
-
-func printIssue(issue *issue) {
-	fmt.Printf("%10.10s %3.0f %-15.15s %-10.10s %-50.50s\n", cyan(issue.Key), issue.Points, issue.Status, issue.Type, issue.Summary)
+	r.Print()
 }
