@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/shawncatz/go-jira"
+	"github.com/andygrunwald/go-jira"
 )
 
 var jiraClient *jira.Client
@@ -85,6 +85,10 @@ func jiraCreate(answers *CreateAnswers) (*jira.Issue, error) {
 }
 
 func printErrResponse(response *jira.Response) {
+	if !debug {
+		return
+	}
+
 	r := response.Response
 	printErr("Jira error: %d : %s\n", r.StatusCode, r.Status)
 	b, err := ioutil.ReadAll(r.Body)
@@ -144,4 +148,30 @@ func getSprintsWalk(boardID int, all bool) (list []jira.Sprint, err error) {
 	}
 
 	return resp, nil
+}
+
+func getIssuesFromSprint(sprintID int) ([]jira.Issue, error) {
+	list, response, err := jiraClient.Sprint.GetIssuesForSprint(sprintID)
+	if err != nil {
+		printErrResponse(response)
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func getPointsField() (*jira.Field, error) {
+	fields, response, err := jiraClient.Field.GetList()
+	if err != nil {
+		printErrResponse(response)
+		return nil, err
+	}
+
+	for _, f := range fields {
+		if f.Name == "Story Points" {
+			return &f, nil
+		}
+	}
+
+	return nil, nil
 }

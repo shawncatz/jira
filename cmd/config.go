@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"os"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 var cfg = &Config{}
@@ -21,8 +21,19 @@ type JiraConfig struct {
 	User    string `yaml:"user" viper:"user"`
 	Pass    string `yaml:"pass" viper:"pass"`
 	Project string
+	Board   *JiraBoard
 	Types   []string
-	Sprints []string
+	Sprints []*JiraSprint
+}
+
+type JiraSprint struct {
+	ID   int
+	Name string
+}
+
+type JiraBoard struct {
+	ID   int
+	Name string
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -71,11 +82,24 @@ func (c *Config) DefaultType() string {
 }
 
 func (c *Config) Sprints() []string {
-	return append([]string{c.DefaultSprint()}, c.Jira.Sprints...)
+	list := []string{}
+	for _, s := range c.Jira.Sprints {
+		list = append(list, s.Name)
+	}
+	return append([]string{c.DefaultSprint()}, list...)
 }
 
 func (c *Config) DefaultSprint() string {
 	return "Backlog"
+}
+
+func (c *Config) findSprint(name string) *JiraSprint {
+	for _, s := range c.Jira.Sprints {
+		if s.Name == name {
+			return s
+		}
+	}
+	return nil
 }
 
 func (c *Config) Save() error {

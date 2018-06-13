@@ -22,30 +22,31 @@ import (
 )
 
 // sprintUpdateCmd represents the sprintUpdate command
-var sprintUpdateCmd = &cobra.Command{
+var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update list of sprints in configuration",
-	Long:  "Update list of sprints in configuration",
+	Short: "Update configuration from Jira",
 	Run: func(cmd *cobra.Command, args []string) {
-		answer, err := askBoard()
+		board, err := askBoard()
 		if err != nil {
 			printErr("Error: %s\n", err)
 			return
 		}
-		sprints, err := getSprints(answer, false)
 
-		list := []string{}
+		sprints, err := getSprints(board.ID, false)
+
+		list := []*JiraSprint{}
 		for _, s := range sprints {
-			list = append(list, s.Name)
+			list = append(list, &JiraSprint{ID: s.ID, Name: s.Name})
 		}
 
+		cfg.Jira.Board = &JiraBoard{ID: board.ID, Name: board.Name}
 		cfg.Jira.Sprints = list
 		cfg.Save()
 	},
 }
 
 func init() {
-	sprintCmd.AddCommand(sprintUpdateCmd)
+	rootCmd.AddCommand(updateCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -58,19 +59,22 @@ func init() {
 	// sprintUpdateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func askBoard() (int, error) {
+func askBoard() (*JiraBoard, error) {
 	boards, err := getBoards()
+	board := &JiraBoard{}
 	if err != nil {
 		printErr("error: %s", err)
-		return 0, err
+		return nil, err
 	}
 
 	if len(boards) == 0 {
-		return 0, fmt.Errorf("no boards found")
+		return nil, fmt.Errorf("no boards found")
 	}
 
 	if len(boards) == 1 {
-		return boards[0].ID, nil
+		board.ID = boards[0].ID
+		board.Name = boards[0].Name
+		return board, nil
 	}
 
 	boardsList := []string{}
@@ -79,7 +83,6 @@ func askBoard() (int, error) {
 		boardsList = append(boardsList, b.Name)
 		boardsMap[b.Name] = b.ID
 	}
-	fmt.Printf("%#v\n%#v\n", boardsList, boardsMap)
 
 	answer := ""
 	q := &survey.Select{
@@ -88,5 +91,5 @@ func askBoard() (int, error) {
 	}
 	survey.AskOne(q, &answer, survey.Required)
 
-	return boardsMap[answer], nil
+	return &JiraBoard{ID: boardsMap[answer], Name: answer}, nil
 }

@@ -26,6 +26,14 @@
 
 
 [[constraint]]
+  name = "github.com/andygrunwald/go-jira"
+  branch = "master"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/logrusorgru/aurora"
+
+[[constraint]]
   branch = "master"
   name = "github.com/mitchellh/go-homedir"
 
@@ -37,10 +45,14 @@
   name = "github.com/spf13/viper"
   version = "1.0.2"
 
+[[constraint]]
+  name = "gopkg.in/AlecAivazis/survey.v1"
+  version = "1.5.3"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
+
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  branch = "sprints-support-state-filter"
-  name = "github.com/shawncatz/go-jira"
