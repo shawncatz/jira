@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/andygrunwald/go-jira"
@@ -11,7 +12,6 @@ import (
 	"github.com/martinlindhe/imgcat/lib"
 	"github.com/wcharczuk/go-chart"
 	"github.com/wcharczuk/go-chart/drawing"
-	"sort"
 )
 
 type SprintReport struct {
