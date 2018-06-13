@@ -9,10 +9,16 @@ import (
 
 var jiraClient *jira.Client
 
+// SprintCompletedDate is for sorting based on completed date
 type SprintCompletedDate []jira.Sprint
 
-func (a SprintCompletedDate) Len() int           { return len(a) }
-func (a SprintCompletedDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+// Len fulfills the sort interface
+func (a SprintCompletedDate) Len() int { return len(a) }
+
+// Swap fulfills the sort interface
+func (a SprintCompletedDate) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// Less fulfills the sort interface
 func (a SprintCompletedDate) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
 // order by EndDate
@@ -28,6 +34,7 @@ func (a SprintCompletedDate) Less(i, j int) bool { return a[i].ID < a[j].ID }
 //	return it.Before(*jt)
 //}
 
+// CreateAnswers stores the answers from the questions of the create command
 type CreateAnswers struct {
 	Project     string
 	Title       string

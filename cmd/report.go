@@ -73,7 +73,7 @@ func runReport(cmd *cobra.Command, args []string) {
 
 	report, err := getReport(a)
 	if err != nil {
-		printErr("%s", err)
+		printErr("%s\n", err)
 		return
 	}
 
@@ -88,12 +88,12 @@ func getReport(name string) (*report, error) {
 
 	issues, err := getIssuesFromSprint(sprint.ID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting issues: %s\n", err)
+		return nil, fmt.Errorf("error getting issues: %s", err)
 	}
 
 	field, err := getPointsField()
 	if err != nil {
-		return nil, fmt.Errorf("error getting points field: %s\n", err)
+		return nil, fmt.Errorf("error getting points field: %s", err)
 	}
 
 	report := &report{}

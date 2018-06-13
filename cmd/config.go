@@ -12,10 +12,12 @@ import (
 
 var cfg = &Config{}
 
+// Config stores the config
 type Config struct {
 	Jira JiraConfig
 }
 
+// JiraConfig stores the config
 type JiraConfig struct {
 	Base    string
 	User    string `yaml:"user" viper:"user"`
@@ -26,11 +28,13 @@ type JiraConfig struct {
 	Sprints []*JiraSprint
 }
 
+// JiraSprint is a simple represenation of a sprint
 type JiraSprint struct {
 	ID   int
 	Name string
 }
 
+// JiraBoard is a simple represenation of a sprint
 type JiraBoard struct {
 	ID   int
 	Name string
@@ -74,6 +78,7 @@ func initConfig() {
 	}
 }
 
+// DefaultType returns the default type or empty string
 func (c *Config) DefaultType() string {
 	if len(c.Jira.Types) > 0 {
 		return c.Jira.Types[0]
@@ -81,6 +86,7 @@ func (c *Config) DefaultType() string {
 	return ""
 }
 
+// Sprints returns the list of sprint names
 func (c *Config) Sprints() []string {
 	list := []string{}
 	for _, s := range c.Jira.Sprints {
@@ -89,6 +95,7 @@ func (c *Config) Sprints() []string {
 	return append([]string{c.DefaultSprint()}, list...)
 }
 
+// DefaultSprint returns the default sprint
 func (c *Config) DefaultSprint() string {
 	return "Backlog"
 }
@@ -102,6 +109,7 @@ func (c *Config) findSprint(name string) *JiraSprint {
 	return nil
 }
 
+// Save the configuration to file
 func (c *Config) Save() error {
 	b, err := yaml.Marshal(cfg)
 	if err != nil {
