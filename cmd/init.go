@@ -25,16 +25,16 @@ import (
 var defaultConfig = []byte(`
 jira:
   base: https://yourcompany.atlassian.net
-  user: user@email.com
-  pass: password_or_api_key
-  project: PROJECT
-  types:
+  user: user@email.com       
+  pass: password_or_api_key  # can be one or the other, api key strongly recommended
+  project: PROJECT           # your default project
+  images: false              # does your terminal support images?
+  types:                     # hope to automate management of these soon
     - Bug
     - Task
     - Story
   sprints:
-    - Sprint1
-    - Sprint2
+  board:
 `)
 
 // initCmd represents the init command
@@ -63,7 +63,7 @@ var initCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("file %s created.\n", cyan(path))
+		fmt.Printf("file %s created.\nRun %s to update the config from Jira.", cyan(path), cyan("jira update"))
 	},
 }
 

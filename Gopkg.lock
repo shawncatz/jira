@@ -21,6 +21,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/golang/freetype"
+  packages = [
+    "raster",
+    "truetype"
+  ]
+  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
+
+[[projects]]
+  branch = "master"
   name = "github.com/google/go-querystring"
   packages = ["query"]
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
@@ -59,6 +68,12 @@
   packages = ["."]
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
   version = "v1.8.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/martinlindhe/imgcat"
+  packages = ["lib"]
+  revision = "faa120996cdb3464fcc0615a26e78f2833cf24d2"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -151,6 +166,30 @@
   version = "v1.0.1"
 
 [[projects]]
+  name = "github.com/wcharczuk/go-chart"
+  packages = [
+    ".",
+    "drawing",
+    "matrix",
+    "roboto",
+    "seq",
+    "util"
+  ]
+  revision = "7c3982fe3d8ab0c9eea9ab5d2aced51e45d447bc"
+  version = "v2.0.1"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/image"
+  packages = [
+    "draw",
+    "font",
+    "math/f64",
+    "math/fixed"
+  ]
+  revision = "af66defab954cb421ca110193eed9477c8541e2a"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -188,6 +227,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "232f5ad996e2b26be01f6a8c87bec4a8e07c86ac43d2d1ade05db191f2f845a9"
+  inputs-digest = "18212ca917ac316d4bbcee4231d626fef4f3e25c0a0d896183089e04446e25a4"
   solver-name = "gps-cdcl"
   solver-version = 1

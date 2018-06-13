@@ -55,17 +55,25 @@ func runReport(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	sprint := cfg.findSprint(a)
-	if sprint == nil {
+	s := cfg.findSprint(a)
+	if s == nil {
 		printErr("error finding sprint")
 		return
 	}
 
-	r := report.NewSprintReport(jiraClient, sprint.ID, sprint.Name)
+	sprint, err := getJiraSprint(cfg.Jira.Board.ID, s.ID)
+	if err != nil {
+		printErr("error finding jira sprint")
+		return
+	}
+
+	r := report.NewSprintReport(jiraClient, sprint)
 	if err != nil {
 		printErr("%s\n", err)
 		return
 	}
+
+	r.ImageSupported = cfg.Jira.Images
 
 	err = r.Build()
 	if err != nil {

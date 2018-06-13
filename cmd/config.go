@@ -26,6 +26,7 @@ type JiraConfig struct {
 	Board   *JiraBoard
 	Types   []string
 	Sprints []*JiraSprint
+	Images  bool
 }
 
 // JiraSprint is a simple represenation of a sprint

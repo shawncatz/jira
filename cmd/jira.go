@@ -157,6 +157,21 @@ func getSprintsWalk(boardID int, all bool) (list []jira.Sprint, err error) {
 	return resp, nil
 }
 
+func getJiraSprint(boardID, sprintID int) (*jira.Sprint, error) {
+	sprints, err := getSprints(boardID, false)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, s := range sprints {
+		if s.ID == sprintID {
+			return &s, nil
+		}
+	}
+
+	return nil, fmt.Errorf("sprint (%d) not found on board (%d)", sprintID, boardID)
+}
+
 func getIssuesFromSprint(sprintID int) ([]jira.Issue, error) {
 	list, response, err := jiraClient.Sprint.GetIssuesForSprint(sprintID)
 	if err != nil {
