@@ -7,6 +7,8 @@ import (
 	"github.com/andygrunwald/go-jira"
 )
 
+const STATE_FILTER = "active,future"
+
 var jiraClient *jira.Client
 
 // SprintCompletedDate is for sorting based on completed date
@@ -20,19 +22,6 @@ func (a SprintCompletedDate) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // Less fulfills the sort interface
 func (a SprintCompletedDate) Less(i, j int) bool { return a[i].ID < a[j].ID }
-
-// order by EndDate
-//func (a SprintCompletedDate) Less(i, j int) bool {
-//	it := a[i].EndDate
-//	jt := a[j].EndDate
-//	if it == nil {
-//		return false
-//	}
-//	if jt == nil {
-//		return true
-//	}
-//	return it.Before(*jt)
-//}
 
 // CreateAnswers stores the answers from the questions of the create command
 type CreateAnswers struct {
@@ -59,20 +48,14 @@ func initClient() {
 }
 
 func jiraCreate(answers *CreateAnswers) (*jira.Issue, error) {
-	f := &jira.IssueFields{
-		Project:     jira.Project{Key: answers.Project},
-		Type:        jira.IssueType{Name: answers.Type},
-		Summary:     answers.Title,
-		Description: answers.Description,
-		Labels:      []string{"from-cli"},
-	}
-
-	if answers.Sprint != "Backlog" {
-		f.Sprint = &jira.Sprint{Name: answers.Sprint}
-	}
-
 	i := jira.Issue{
-		Fields: f,
+		Fields: &jira.IssueFields{
+			Project:     jira.Project{Key: answers.Project},
+			Type:        jira.IssueType{Name: answers.Type},
+			Summary:     answers.Title,
+			Description: answers.Description,
+			Labels:      []string{"from-cli"},
+		},
 	}
 
 	if debug {
@@ -82,10 +65,21 @@ func jiraCreate(answers *CreateAnswers) (*jira.Issue, error) {
 
 	issue, response, err := jiraClient.Issue.Create(&i)
 	if err != nil {
-		//printErr(err.Error())
-		b, _ := ioutil.ReadAll(response.Response.Body)
-		//fmt.Printf("response:\n%s\n", string(b))
-		return nil, fmt.Errorf("error creating issue: %s\nResponse: %s", err.Error(), string(b))
+		printErrResponse(response)
+		return nil, fmt.Errorf("could not create issue: %s\n", err.Error())
+	}
+
+	if answers.Sprint != "Backlog" {
+		//f.Sprint = &jira.Sprint{Name: answers.Sprint}
+		sprint := cfg.findSprint(answers.Sprint)
+		if sprint == nil {
+			return nil, fmt.Errorf("issue was created (%s), but could not move to sprint", issue.ID)
+		}
+
+		_, err := jiraClient.Sprint.MoveIssuesToSprint(sprint.ID, []string{issue.ID})
+		if err != nil {
+			return nil, fmt.Errorf("issue was created (%s), could not move to sprint: %s", issue.ID, err)
+		}
 	}
 
 	return issue, nil
@@ -125,7 +119,7 @@ func getBoards() (list []jira.Board, err error) {
 func getSprints(boardID int, all bool) (list []jira.Sprint, err error) {
 	options := &jira.GetAllSprintsOptions{}
 	if !all {
-		options.State = "active,future"
+		options.State = STATE_FILTER
 	}
 	return getSprintsWalk(boardID, all)
 }
@@ -135,7 +129,7 @@ func getSprintsWalk(boardID int, all bool) (list []jira.Sprint, err error) {
 
 	options := &jira.GetAllSprintsOptions{SearchOptions: jira.SearchOptions{StartAt: 0}}
 	if !all {
-		options.State = "active,future"
+		options.State = STATE_FILTER
 	}
 
 	// continue making the call and appending until we get the last response.

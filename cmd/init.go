@@ -63,7 +63,7 @@ var initCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("file %s created.\nRun %s to update the config from Jira.", cyan(path), cyan("jira update"))
+		fmt.Printf("file %s created.\nAdd your jira configuration, then run %s to update the config from Jira.\n", white(path), white("jira update"))
 	},
 }
 

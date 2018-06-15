@@ -16,8 +16,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -44,6 +46,12 @@ func init() {
 }
 
 func runCreate(cmd *cobra.Command, args []string) {
+	if len(cfg.Jira.Types) == 0 {
+		printErr("you must include at least one Type in the configuration.\n" +
+			"add a list of types to " + viper.ConfigFileUsed() + ".")
+		os.Exit(1)
+	}
+
 	var questions = []*survey.Question{
 		{
 			Name:     "project",

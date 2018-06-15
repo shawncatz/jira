@@ -67,14 +67,9 @@ func initConfig() {
 	}
 
 	// If a config file is found, read it in.
-	if err := viper.Unmarshal(cfg); err != nil {
-		fmt.Printf("Can't read config: (%#v) %s\n", cfg, err)
-		os.Exit(1)
-	}
-
-	if len(cfg.Jira.Types) == 0 {
-		printErr("you must include at least one Type in the configuration.\n" +
-			"add a list of types to " + viper.ConfigFileUsed() + ".")
+	err = viper.Unmarshal(cfg)
+	if err != nil || cfg.Jira.User == "" || cfg.Jira.Pass == "" {
+		printErr("Can't read config.\n")
 		os.Exit(1)
 	}
 }

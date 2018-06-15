@@ -1,30 +1,7 @@
 # Jira CLI
 
-Basic golang-based `Jira` CLI. Allows you to `create`, `show`, and `browse` to issues
-
-## Show
-
-Get a quick summary of a ticket.
-
-> jira show TICKET-1234
-
-```bash
-TICKET-1234    : Title of issue
-Type           : Bug
-Priority       : Blocker
-Assigned       : person
-Description    :
-Something was borked
-
-person2 (person2@email.com)
-Fixed!
-
-person3 (person3@email.com)
-Link to document
-https://docs.google.com/document/d/...
-
-https://yourcompany.atlassian.net/browse/TICKET-1234
-```
+Basic golang-based `Jira` CLI. Allows you to `create`, `show`, and `browse` 
+to issues
 
 ## Browse
 
@@ -59,11 +36,53 @@ Some of the fields allow you to select from a list
   Story
 ```
 
+## Show
+
+Get a quick summary of a ticket.
+
+> jira show TICKET-1234
+
+```bash
+TICKET-1234    : Title of issue
+Type           : Bug
+Priority       : Blocker
+Assigned       : person
+Description    :
+Something was borked
+
+person2 (person2@email.com)
+Fixed!
+
+person3 (person3@email.com)
+Link to document
+https://docs.google.com/document/d/...
+
+https://yourcompany.atlassian.net/browse/TICKET-1234
+```
+
 ## Init
 
 Creates a default configuration file
 
 > jira init
+
+## Report
+
+Generate reports. Currently supports sprint report only.
+
+> jira report
+
+## Sprint
+
+Manage sprints in Jira. For now, just list sprints.
+
+> jira sprint
+
+## Update
+
+Updates the configuration file with values from Jira (`board`, `sprints`)
+
+> jira update
 
 # Setup
 
@@ -74,14 +93,12 @@ base: <base URL>
 user: <email>
 pass: <api key>
 project: PROJECT
+board: # This will be populated by running 'jira update'
 types: # First in the list is default, must have at least one
   - Bug
   - Task
   - Story
-sprints: # Automatically adds Backlog to the list
-  - Sprint1
-  - Sprint2
-  - Sprint3
+sprints: # This will be populated by running 'jira update'
 ```
 
 * `base URL`: The URL to your Atlassian Cloud JIRA account 
@@ -93,6 +110,12 @@ sprints: # Automatically adds Backlog to the list
 
 The easiest and recommended way to setup the tool is to download a prebuilt 
 [release](https://github.com/shawncatz/jira/releases) from Github.
+
+Move the file into your `~/bin` directory and reset the permissions:
+
+> mkdir -p ~/bin
+> mv ~/Download/jira-darwin-amd64-<version> ~/bin/jira
+> chmod 0755 ~/bin/jira
 
 ### Install from source
 
